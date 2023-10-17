@@ -1,0 +1,24 @@
+service: backend-group
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: go1.x
+  stage: dev
+  region: us-east-1
+
+package:
+  patterns:
+    - '!./**'
+    - ./bin/**
+
+functions:
+  createGroup:
+    environment:
+      DYNAMODB_GROUP_TABLE: ${ssm:dev-parameter-backend-group-table_name}
+    handler: bin/create-group
+    role:  ${ssm:dev-parameter-backend-group-create-createGroup-role-arn} 
+    events:
+      - httpApi:
+          path: /createGroup
+          method: post
